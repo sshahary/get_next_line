@@ -6,7 +6,7 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:03:46 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/27 11:29:03 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/27 15:59:09 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,17 @@ char	*substr_n(char *str)
 	line = ft_calloc(i + 2, sizeof(char));
 	if (!line)
 		return (NULL);
+	i = 0;
+	while (str && str[i] != '\0' && str[i] != '\n')
+	{
+		line[i] = str[i];
+		i++;
+	}
 	if (str[i] != '\0' && str[i] == '\n')
 	{
 		line[i] = '\n';
 		i++;
 	}
-	ft_strlcpy(line, str, i + 1);
 	return (line);
 }
 
@@ -47,23 +52,20 @@ char	*substr_n_after(char *str)
 {
 	char	*line;
 	int		i;
+	int		j;
 
 	i = 0;
+	j = 0;
 	while (str[i] != '\n' && str[i] != '\0')
 		i++;
-	if (str[i] == '\0')
-	{
-		line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
-		if (!line)
-			return (free(str), NULL);
-		ft_strlcpy(line, str + i, ft_strlen(str) - i + 1);
-		return (line);
-	}
-	i++;
 	line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
 	if (!line)
-		return (NULL);
-	ft_strlcpy(line, str + i, ft_strlen(str) - i + 1);
+		return (free(str), NULL);
+	i++;
+	while (str[i - 1] != '\0') // (- 1) put later
+		line[j++] = str[i++];
+	line[j] = '\0';
+	free(str);
 	return (line);
 }
 
@@ -72,28 +74,27 @@ char	*ft_read(int fd, char *str)
 {
 	int		i;
 	char	*tmp;
-	char	*new_str;
 
+	if (read(fd, 0, 0) < 0)
+		return (free(str), NULL);
 	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!tmp)
-		return (free(str), NULL);
-	i = 1;
-	while (i > 0 && !(ft_strchr(str, '\n')))
+		return (NULL);
+	i = read(fd, tmp, BUFFER_SIZE);
+	while (i > 0)
 	{
-		i = read(fd, tmp, BUFFER_SIZE);
-		if (i == -1)
-			return (free(tmp), free(str), NULL);
 		tmp[i] = '\0';
-		new_str = ft_calloc(ft_strlen(str) + i + 1, sizeof(char));
-		if (!new_str)
-			return (free(tmp), free(str), NULL);
-		ft_strlcpy(new_str, str, ft_strlen(str) + i + 1);
-		ft_strlcat(new_str, tmp, ft_strlen(str) + i + 1);
-		free(str);
-		str = new_str;
+		str = ft_strjoin(str, tmp);
+		if (ft_strchr(tmp, '\n') || i == 0)
+			break ;
+		i = read(fd, tmp, BUFFER_SIZE);
 	}
 	free(tmp);
-	new_str = 0;
+	if (i <= 0 && str[0] == '\0')
+	{
+		free(str);
+		return (NULL);
+	}
 	return (str);
 }
 
@@ -102,7 +103,7 @@ char	*get_next_line(int fd)
 {
 	static char	*str;
 	char		*line;
-	char		*new_str;
+
 
 	if (ft_checkerrors(fd))
 		return (NULL);
@@ -112,32 +113,36 @@ char	*get_next_line(int fd)
 	if (!str)
 		return (free(str), NULL);
 	line = substr_n(str);
-	new_str = substr_n_after(str);
-	free(str);
-	str = new_str;
+	str = substr_n_after(str);
 	return (line);
 }
 
-// int	main(void)
+// void leak(void)
 // {
-// 	int	fd;
+// 	system("leaks a.out");
+// }
 
-// 	fd = open("123.text", O_RDONLY);
-// 	if (fd == -1)
+// int main(void)
+// {
+// 	int		fd;
+// 	int		i;
+// 	char	*line;
+
+// 	i = 30;
+// 	fd = open("example.txt", O_RDONLY);
+// 	while (i > 0)
 // 	{
-// 		perror("Error opening file");
-// 		return (1);
+// 		line = get_next_line(fd);
+// 		if (!line)
+// 		{
+// 			printf("\nft returned NULL\n");
+// 			leak();
+// 			return (0);
+// 		}
+// 		printf("%s", line);
+// 		free(line);
+// 		i--;
 // 	}
-// 	printf("line :%s", get_next_line(fd));
-// 	printf("line :%s", get_next_line(fd));
-// 	printf("line :%s", get_next_line(fd));
-// 	printf("line :%s", get_next_line(fd));
-// 	// char *line;
-// 	// while ((line = get_next_line(fd)) != NULL)
-// 	// {
-// 	// 	printf("line: %s\n", line);
-// 	// 	free(line); // Free each line after printing
-// 	// }
-// 	close(fd);
+// 	leak();
 // 	return (0);
 // }
