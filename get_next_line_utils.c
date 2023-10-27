@@ -6,7 +6,7 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 10:38:20 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/26 11:09:38 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/27 11:25:55 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,27 @@ size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
 // 	}
 // 	return (d);
 // }
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	char	*s;
+	size_t	i;
+	size_t	max;
+
+	max = 0 - 1;
+	if ((long long)count * size > max)
+		return (NULL);
+	i = 0;
+	s = (char *)malloc(count * size);
+	if (!s)
+		return (NULL);
+	while (count * size > i)
+	{
+		s[i] = 0;
+		i++;
+	}
+	return (s);
+}
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {

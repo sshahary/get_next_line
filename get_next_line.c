@@ -6,7 +6,7 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:03:46 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/26 11:40:44 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/27 11:29:03 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	ft_checkerrors(int fd)
 {
-	if (fd < 0 || BUFFER_SIZE < 1 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE < 1)
 		return (1);
 	return (0);
 }
@@ -30,7 +30,7 @@ char	*substr_n(char *str)
 		return (NULL);
 	while (str[i] != '\n' && str[i] != '\0')
 		i++;
-	line = (char *)malloc(i + 1);
+	line = ft_calloc(i + 2, sizeof(char));
 	if (!line)
 		return (NULL);
 	if (str[i] != '\0' && str[i] == '\n')
@@ -53,14 +53,14 @@ char	*substr_n_after(char *str)
 		i++;
 	if (str[i] == '\0')
 	{
-		line = (char *)malloc((ft_strlen(str) - i + 1) * (sizeof(char)));
+		line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
 		if (!line)
 			return (free(str), NULL);
 		ft_strlcpy(line, str + i, ft_strlen(str) - i + 1);
 		return (line);
 	}
 	i++;
-	line = (char *)malloc((ft_strlen(str) - i + 1) * (sizeof(char)));
+	line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
 	if (!line)
 		return (NULL);
 	ft_strlcpy(line, str + i, ft_strlen(str) - i + 1);
@@ -74,7 +74,7 @@ char	*ft_read(int fd, char *str)
 	char	*tmp;
 	char	*new_str;
 
-	tmp = (char *)malloc(BUFFER_SIZE + 1);
+	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!tmp)
 		return (free(str), NULL);
 	i = 1;
@@ -84,7 +84,7 @@ char	*ft_read(int fd, char *str)
 		if (i == -1)
 			return (free(tmp), free(str), NULL);
 		tmp[i] = '\0';
-		new_str = (char *)malloc(ft_strlen(str) + i + 1);
+		new_str = ft_calloc(ft_strlen(str) + i + 1, sizeof(char));
 		if (!new_str)
 			return (free(tmp), free(str), NULL);
 		ft_strlcpy(new_str, str, ft_strlen(str) + i + 1);
@@ -107,7 +107,7 @@ char	*get_next_line(int fd)
 	if (ft_checkerrors(fd))
 		return (NULL);
 	if (!str)
-		str = (char *)malloc(1);
+		str = ft_calloc(1, 1);
 	str = ft_read(fd, str);
 	if (!str)
 		return (free(str), NULL);

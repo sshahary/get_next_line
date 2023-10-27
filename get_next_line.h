@@ -6,7 +6,7 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/18 10:38:35 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/26 10:47:06 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/27 11:26:14 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@ char	*ft_strchr(const char *s, int c);
 char	*get_next_line(int fd);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);
 size_t	ft_strlcat(char *dst, const char *src, size_t dstsize);
+void	*ft_calloc(size_t count, size_t size);
 
 #endif
