@@ -6,18 +6,18 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:03:46 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/27 15:59:09 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/28 12:36:43 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_checkerrors(int fd)
-{
-	if (fd < 0 || BUFFER_SIZE < 1)
-		return (1);
-	return (0);
-}
+// int	ft_checkerrors(int fd)
+// {
+// 	if (fd < 0 || BUFFER_SIZE < 1)
+// 		return (1);
+// 	return (0);
+// }
 
 // Function to find and return a line
 char	*substr_n(char *str)
@@ -56,6 +56,8 @@ char	*substr_n_after(char *str)
 
 	i = 0;
 	j = 0;
+	if (!str)
+		return (NULL);
 	while (str[i] != '\n' && str[i] != '\0')
 		i++;
 	line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
@@ -79,7 +81,7 @@ char	*ft_read(int fd, char *str)
 		return (free(str), NULL);
 	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!tmp)
-		return (NULL);
+		return (free(str), NULL);
 	i = read(fd, tmp, BUFFER_SIZE);
 	while (i > 0)
 	{
@@ -104,9 +106,8 @@ char	*get_next_line(int fd)
 	static char	*str;
 	char		*line;
 
-
-	if (ft_checkerrors(fd))
-		return (NULL);
+	if (fd < 0 || BUFFER_SIZE < 1)
+		return (free(str), NULL);
 	if (!str)
 		str = ft_calloc(1, 1);
 	str = ft_read(fd, str);
