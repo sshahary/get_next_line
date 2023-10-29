@@ -6,18 +6,11 @@
 /*   By: sshahary <sshahary@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/21 16:03:46 by sshahary          #+#    #+#             */
-/*   Updated: 2023/10/28 12:36:43 by sshahary         ###   ########.fr       */
+/*   Updated: 2023/10/29 17:46:53 by sshahary         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-// int	ft_checkerrors(int fd)
-// {
-// 	if (fd < 0 || BUFFER_SIZE < 1)
-// 		return (1);
-// 	return (0);
-// }
 
 // Function to find and return a line
 char	*substr_n(char *str)
@@ -26,11 +19,13 @@ char	*substr_n(char *str)
 	int		i;
 
 	i = 0;
-	if (!str[i])
+	if (!str)
 		return (NULL);
 	while (str[i] != '\n' && str[i] != '\0')
 		i++;
-	line = ft_calloc(i + 2, sizeof(char));
+	if (str[i] == '\n')
+		i++;
+	line = ft_calloc(i + 1, sizeof(char));
 	if (!line)
 		return (NULL);
 	i = 0;
@@ -39,11 +34,9 @@ char	*substr_n(char *str)
 		line[i] = str[i];
 		i++;
 	}
-	if (str[i] != '\0' && str[i] == '\n')
-	{
-		line[i] = '\n';
-		i++;
-	}
+	if (str[i] == '\n')
+		line[i++] = '\n';
+	line[i] = '\0';
 	return (line);
 }
 
@@ -60,11 +53,13 @@ char	*substr_n_after(char *str)
 		return (NULL);
 	while (str[i] != '\n' && str[i] != '\0')
 		i++;
+	if (str[i] == '\0')
+		return (free(str), NULL);
 	line = ft_calloc((ft_strlen(str) - i + 1), (sizeof(char)));
 	if (!line)
 		return (free(str), NULL);
 	i++;
-	while (str[i - 1] != '\0') // (- 1) put later
+	while (str[i] != '\0')
 		line[j++] = str[i++];
 	line[j] = '\0';
 	free(str);
@@ -75,28 +70,21 @@ char	*substr_n_after(char *str)
 char	*ft_read(int fd, char *str)
 {
 	int		i;
-	char	*tmp;
+	char	tmp[BUFFER_SIZE + 1];
 
 	if (read(fd, 0, 0) < 0)
 		return (free(str), NULL);
-	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (!tmp)
-		return (free(str), NULL);
-	i = read(fd, tmp, BUFFER_SIZE);
-	while (i > 0)
+	i = 1;
+	while (i > 0 && !ft_strchr(str, '\n'))
 	{
-		tmp[i] = '\0';
-		str = ft_strjoin(str, tmp);
-		if (ft_strchr(tmp, '\n') || i == 0)
-			break ;
 		i = read(fd, tmp, BUFFER_SIZE);
+		if (i == -1)
+			return (free(str), NULL);
+		tmp[i] = '\0';
+		str = ft_strjoin_temp(str, tmp);
 	}
-	free(tmp);
 	if (i <= 0 && str[0] == '\0')
-	{
-		free(str);
-		return (NULL);
-	}
+		return (free(str), NULL);
 	return (str);
 }
 
@@ -107,9 +95,13 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE < 1)
-		return (free(str), NULL);
+		return (NULL);
 	if (!str)
-		str = ft_calloc(1, 1);
+	{
+		str = (char *)ft_calloc(BUFFER_SIZE + 1, 1);
+		if (!str)
+			return (NULL);
+	}
 	str = ft_read(fd, str);
 	if (!str)
 		return (free(str), NULL);
@@ -118,32 +110,26 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-// void leak(void)
+// int	main(void)
 // {
-// 	system("leaks a.out");
-// }
+// 	int	fd;
 
-// int main(void)
-// {
-// 	int		fd;
-// 	int		i;
-// 	char	*line;
-
-// 	i = 30;
-// 	fd = open("example.txt", O_RDONLY);
-// 	while (i > 0)
+// 	fd = open("123.text", O_RDONLY);
+// 	if (fd == -1)
 // 	{
-// 		line = get_next_line(fd);
-// 		if (!line)
-// 		{
-// 			printf("\nft returned NULL\n");
-// 			leak();
-// 			return (0);
-// 		}
-// 		printf("%s", line);
-// 		free(line);
-// 		i--;
+// 		perror("Error opening file");
+// 		return (1);
 // 	}
-// 	leak();
+// 	printf("line :%s", get_next_line(fd));
+// 	// printf("line :%s", get_next_line(fd));
+// 	// printf("line :%s", get_next_line(fd));
+// 	// printf("line :%s", get_next_line(fd));
+// 	// char *line;
+// 	// while ((line = get_next_line(fd)) != NULL)
+// 	// {
+// 	// 	printf("line: %s\n", line);
+// 	// 	free(line); // Free each line after printing
+// 	// }
+// 	close(fd);
 // 	return (0);
 // }
